@@ -113,6 +113,14 @@ namespace lib {
             return m_size;
         }
 
+        size_t size() const {
+            return m_size;
+        }
+
+        bool empty() {
+            return m_size == 0;
+        }
+
         const T& front() {
             if (!head) {
                 throw std::out_of_range("List is empty.");
