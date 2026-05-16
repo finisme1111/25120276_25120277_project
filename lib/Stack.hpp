@@ -1,4 +1,6 @@
 #pragma once
+#ifndef STACK_HPP
+#define STACK_HPP
 #include "LinkedList.hpp"
 #include <stdexcept>
 #include <cstddef>
@@ -55,3 +57,5 @@ namespace lib {
         }
     };
 }
+
+#endif

@@ -1,4 +1,6 @@
 #pragma once
+#ifndef LINKEDLIST_HPP
+#define LINKEDLIST_HPP
 #include <stdexcept>
 #include <cstddef>
 
@@ -151,3 +153,5 @@ namespace lib {
         }
     };
 }
+
+#endif

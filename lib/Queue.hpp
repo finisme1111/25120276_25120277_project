@@ -1,4 +1,6 @@
 #pragma once
+#ifndef QUEUE_HPP
+#define QUEUE_HPP
 #include <stdexcept>
 #include <cstddef>
 
@@ -54,3 +56,5 @@ namespace lib {
         }
     };
 }
+
+#endif
