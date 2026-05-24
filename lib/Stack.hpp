@@ -1,61 +1,62 @@
-#pragma once
+#pragma once 
 #ifndef STACK_HPP
 #define STACK_HPP
 #include "LinkedList.hpp"
 #include <stdexcept>
 #include <cstddef>
+#include <functional>
 
 namespace lib {
-    template <typename T>
+    template<typename T>
     class Stack {
     private:
-        lib::LinkedList<T> list;
+        LinkedList<T> list;
     public:
         Stack() = default;
 
         ~Stack() = default;
 
-        Stack(const Stack& other) = default;
+        Stack(const Stack& other) : list(other.list) {}
 
-        Stack& operator=(const Stack& other) = default;
+        Stack& operator=(const Stack& other) {
+            if (this != &other) {
+                list = other.list;
+            }
+            return *this;
+        }
 
         void push(const T& value) {
-            list.push_front(T);
+            list.insertFront(value);
         }
 
         void pop() {
-            if (list.empty()) {
-                throw std::out_of_range("Stack is empty.");
+            if (empty()) {
+                throw std::underflow_error("Stack underflow: Stack is empty.");
             }
-            list.pop_back();
+            list.removeFront();
         }
 
-        const T& top() {
-            if (list.empty()) {
-                throw std::out_of_range("Stack is empty.");
-            }
-            return list.front();
-        }
-
-        T& top() {
-            if (list.empty()) {
-                throw std::out_of_range("Stacks is empty.");
+        T top() {
+            if (empty()) {
+                throw std::underflow_error("Stack underflow: Stack is empty.");
             }
             return list.front();
         }
 
-        bool empty() {
-            return list.size() == 0;
+        T top() const {
+            if (empty()) {
+                throw std::underflow_error("Stack underflow: Stack is empty.");
+            }
+            return list.front();
         }
 
-        size_t size() {
+        bool empty() const {
+            return list.empty();
+        }
+
+        size_t size() const {
             return list.size();
-        }
-
-        void clear() {
-            list.clear();
         }
     };
 }
-
 #endif

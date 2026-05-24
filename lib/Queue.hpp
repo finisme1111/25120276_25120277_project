@@ -1,60 +1,62 @@
-#pragma once
+#pragma
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
+#include "LinkedList.hpp"
 #include <stdexcept>
 #include <cstddef>
+#include <functional>
 
-namespace lib {
-    template <typename T>
+namespace lib{
+    template<typename T>
     class Queue {
     private:
-        lib::LinkedList<T> list;
+        LinkedList<T> list;
     public:
-        Queue() = default;
+        Queue = default;
 
-        ~Queue() = default;
+        ~Queue = default;
 
-        Queue(const T& other) = default;
+        Queue(const Queue &other) : list(other.list) {}
 
-        Queue& operator=(const T& other) = default;
-
-        void push(const T& value) {
-            list.push_back();
-        }
-
-        void pop() {
-            if (list.empty()) {
-                throw std::out_of_range("Queue is empty.");
+        Queue& operator=(const Queue& other) {
+            if (this != &other) {
+                list = other.list;
             }
-            list.pop_back();
+            return *this;
         }
 
-        const T& top() {
-            if (list.empty()) {
-                throw std::out_of_range("Queue is empty.");
+        void enqueue(const T& value) {
+            list.insertFront(value);
+        }
+
+        void dequeue() {
+            if (empty()) {
+                throw std::underflow_error("Queue underflow: Queue is empty.");
             }
-            return list.front();
+            list.removeBack();
         }
 
-        T& top() {
-            if (list.empty()) {
-                throw std::out_of_range("Queue is empty.");
+        T front() {
+            if (empty()) {
+                throw std::underflow_error("Queue underflow: Queue is empty.");
             }
-            return list.front();
+            return list.back();
         }
 
-        bool empty() {
-            return list.size() == 0;
+        T front() const {
+            if (empty()) {
+                throw std::underflow_error("Queue underflow: Queue is empty.");
+            }
+            return list.back();
         }
 
-        size_t size() {
+        bool empty() const {
+            return list.empty();
+        }
+
+        size_t size() const {
             return list.size();
-        }
-
-        void clear() {
-            list.clear();
         }
     };
 }
-
 #endif

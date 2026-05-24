@@ -12,6 +12,7 @@ namespace lib {
         a = b;
         b = tmp;
     }
+    
     template <typename T>
     size_t linear_search(const T a[], size_t n, const T& value) {
         for (size_t i = 0; i < n; i++) {

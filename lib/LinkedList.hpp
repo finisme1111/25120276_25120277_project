@@ -3,155 +3,248 @@
 #define LINKEDLIST_HPP
 #include <stdexcept>
 #include <cstddef>
+#include <functional>
+#include <iostream>
 
 namespace lib {
-    template <typename T>
+    template<typename T>
     class LinkedList {
     private:
-        Struct Node {
+        struct Node {
             T data;
             Node* next;
-            Node(const T& value) : data(value), next(nullptr) {}
+            Node* prev;
+            Node(const T& value) : data(value), next(nullptr), prev(nullptr) {}
         };
+        Node *head;
+        Node *tail;
+        size_t sze;
 
-        Node* head;
-        Node* tail;
-        size_t m_size;
+    public: 
+        LinkedList() : head(nullptr), tail(nullptr), sze(0) {}
 
-    public:
-        LinkedList() : head(nullptr), tail(nullptr), m_size(0) {}
+        ~LinkedList() {
+            clear();
+        }
 
-        ~LinkedList() {clear();}
-
-        LinkedList(const LinkedList& other) : head(nullptr), tail(nullptr), m_size(0) {
-            Node* cur = other.head;
-            while (cur) {
-                push_back(cur->data);
-                cur = cur->next;
+        LinkedList(const LinkedList& other) : head(nullptr), tail(nullptr), sze(0) {
+            Node* current = other.head;
+            while (current) {
+                insertBack(current->data);
+                current = current->next;
             }
         }
 
         LinkedList& operator=(const LinkedList& other) {
             if (this != &other) {
                 clear();
-                Node* cur = other.head;
-                while (cur) {
-                    push_back(cur->data);
-                    cur = cur->next;
+                Node* current = other.head;
+                while (current) {
+                    insertBack(current->data);
+                    current = current->next;
                 }
             }
             return *this;
         }
 
-        void push_back(const T& value) {
-            Node * new_node = new Node(value);
+        void insertFront(const T& value) {
+            Node* newNode = new Node(value);
             if (!head) {
-                head = tail = new_node;
+                head = tail = newNode;
             }
             else {
-                tail->next = new_node;
-                tail = new_node;
+                newNode->next = head;
+                head->prev = newNode;
+                head = newNode;
             }
-            m_size++;
+            sze++;
         }
 
-        void push_front(const T& value) {
-            Node* new_node = new Node(value);
-            if (!head) {
-                head = tail = new_node;
+        void insertBack(const T& value) {
+            Node* newNode = new Node(value);
+            if (!tail) {
+                head = tail = newNode;
             }
             else {
-                new_node->next = head;
-                head = new_node;
+                tail->next = newNode;
+                newNode->prev = tail;
+                tail = newNode;
             }
-            m_size++;
+            sze++;
         }
 
-        void pop_back() {
-            if (!head) {
+        void insertAt(size_t index, const T& value) {
+            if (index > sze) {
+                throw std::out_of_range("Index out of range.");
+            }
+            if (index == 0) {
+                insertFront(value);
+            }
+            else if (index == sze) {
+                insertBack(value);
+            }
+            else {
+                Node* current = head;
+                for (size_t i = 0; i < index; i++) {
+                    current = current->next;
+                }
+                Node* newNode = new Node(value);
+                newNode->prev = current->prev;
+                newNode->next = current;
+                current->prev->next = newNode;
+                current->prev = newNode;
+                sze++;
+            }
+        }
+
+        void removeFront() {
+            if (empty()) {
                 throw std::out_of_range("List is empty.");
             }
-            if (head == tail) {
-                delete head;
-                head = tail = nullptr;
+            Node* toDelete = head;
+            head = head->next;
+            if (head) {
+                head->prev = nullptr;
             }
             else {
-                Node* cur = head;
-                while (cur->next != tail) {
-                    cur = cur->next;
-                }
-                delete tail;
-                tail = cur;
+                tail = nullptr;
+            }
+            delete toDelete;
+            sze--;
+        }
+
+        void removeBack() {
+            if (empty()) {
+                throw std::out_of_range("List is empty.");
+            }
+            Node* toDelete = tail;
+            tail = tail->prev;
+            if (tail) {
                 tail->next = nullptr;
             }
-            m_size--;
+            else {
+                head = nullptr;
+            }
+            delete toDelete;
+            sze--;
         }
 
-        void pop_front() {
-            if (!head) {
-                throw std::out_of_range("List is empty.");
+        void remove(const T& value) {
+            Node* current = head;
+            while (current) {
+                if (current->data == value) {
+                    if (current == head) {
+                        removeFront();
+                    }
+                    else if (current == tail) {
+                        removeBack();
+                    }
+                    else {
+                        current->prev->next = current->next;
+                        current->next->prev = current->prev;
+                        delete current;
+                        sze--;
+                    }
+                    return;
+                }
+                current = current->next;
             }
-            Node* tmp = head;
-            head = head->next;
-            delete tmp;
-            if (!head) {
-                tail = nullptr;
-
-            }
-            m_size--;
         }
 
-        void clear() {
-            Node* cur = head;
-            while (cur) {
-                Node* next = cur->next;
-                delete cur;
-                cur = next;
+        void removeAt(size_t index) {
+            if (index >= sze) {
+                throw std::out_of_range("Index out of range.");
             }
-            head = tail = nullptr;
-            m_size = 0;
+            if (index == 0) {
+                removeFront();
+            }
+            else if (index == sze - 1) {
+                removeBack();
+            }
+            else {
+                Node* toDelete = head;
+                for (size_t i = 0; i < index; i++) {
+                    toDelete = toDelete->next;
+                }
+                toDelete->prev->next =toDelete->next;
+                toDelete->next->prev = toDelete->prev;
+                delete toDelete;
+                sze--;
+            }
         }
 
-        size_t size() {
-            return m_size;
+        size_t find(const T& value) {
+            Node* current = head;
+            size_t index = 0;
+            while (current) {
+                if (current->data == value) {
+                    return index;
+                }
+                current = current->next;
+                index++;
+            }
+            return static_cast<size_t>(-1);
         }
 
         size_t size() const {
-            return m_size;
+            return sze;
         }
 
-        bool empty() {
-            return m_size == 0;
+        bool empty() const {
+            return sze == 0;
         }
 
-        const T& front() {
-            if (!head) {
+        void clear() { 
+            while (!empty()) {
+                removeFront();
+            }
+        }
+
+        T front() {
+            if (empty()) {
                 throw std::out_of_range("List is empty.");
             }
             return head->data;
         }
 
-        T& front() {
-            if (!head) {
+        T back() {
+            if (empty()) {
+                throw std::out_of_range("List is empty.");
+            }
+            return tail->data;
+        }
+
+        T front() const {
+            if (empty()) {
                 throw std::out_of_range("List is empty.");
             }
             return head->data;
         }
 
-        const T& back() {
-            if (!tail) {
+        T back() const {
+            if (empty()) {
                 throw std::out_of_range("List is empty.");
             }
             return tail->data;
         }
 
-        T& back() {
-            if (!tail) {
-                throw std::out_of_range("List is empty.");
+        void printForward() const {
+            Node* current = head;
+            while (current) {
+                std::cout << current->data << " ";
+                current = current->next;
             }
-            return tail->data;
+            std::cout << '\n';
+        }
+
+        void printBackward() const {
+            Node* current = tail;
+            while (current) {
+                std::cout << current->data << " ";
+                current = current->prev;
+            }
+            std::cout << '\n';
         }
     };
 }
-
 #endif
