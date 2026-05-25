@@ -245,6 +245,40 @@ namespace lib {
             }
             std::cout << '\n';
         }
+
+        /** Lay phan tu tai vi tri index (0-based) */
+        T& get(size_t index) {
+            if (index >= sze) throw std::out_of_range("Index out of range.");
+            Node* current = head;
+            for (size_t i = 0; i < index; i++) current = current->next;
+            return current->data;
+        }
+
+        const T& get(size_t index) const {
+            if (index >= sze) throw std::out_of_range("Index out of range.");
+            Node* current = head;
+            for (size_t i = 0; i < index; i++) current = current->next;
+            return current->data;
+        }
+
+        /** Duyet tung phan tu tu dau den cuoi */
+        void forEach(std::function<void(const T&)> fn) const {
+            Node* current = head;
+            while (current) {
+                fn(current->data);
+                current = current->next;
+            }
+        }
+
+        /** Duyet tung phan tu tu cuoi ve dau */
+        void forEachReverse(std::function<void(const T&)> fn) const {
+            Node* current = tail;
+            while (current) {
+                fn(current->data);
+                current = current->prev;
+            }
+        }
     };
 }
+
 #endif

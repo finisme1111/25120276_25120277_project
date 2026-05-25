@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 #include "LinkedList.hpp"
@@ -6,17 +6,17 @@
 #include <cstddef>
 #include <functional>
 
-namespace lib{
+namespace lib {
     template<typename T>
     class Queue {
     private:
         LinkedList<T> list;
     public:
-        Queue = default;
+        Queue() = default;
 
-        ~Queue = default;
+        ~Queue() = default;
 
-        Queue(const Queue &other) : list(other.list) {}
+        Queue(const Queue& other) : list(other.list) {}
 
         Queue& operator=(const Queue& other) {
             if (this != &other) {
@@ -26,28 +26,28 @@ namespace lib{
         }
 
         void enqueue(const T& value) {
-            list.insertFront(value);
+            list.insertBack(value);
         }
 
         void dequeue() {
             if (empty()) {
                 throw std::underflow_error("Queue underflow: Queue is empty.");
             }
-            list.removeBack();
+            list.removeFront();
         }
 
         T front() {
             if (empty()) {
                 throw std::underflow_error("Queue underflow: Queue is empty.");
             }
-            return list.back();
+            return list.front();
         }
 
         T front() const {
             if (empty()) {
                 throw std::underflow_error("Queue underflow: Queue is empty.");
             }
-            return list.back();
+            return list.front();
         }
 
         bool empty() const {
@@ -56,6 +56,10 @@ namespace lib{
 
         size_t size() const {
             return list.size();
+        }
+
+        void clear() {
+            list.clear();
         }
     };
 }

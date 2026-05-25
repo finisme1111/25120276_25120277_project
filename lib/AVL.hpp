@@ -6,6 +6,7 @@
 #include <functional>
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 namespace lib {
     template<typename T>
@@ -217,6 +218,29 @@ namespace lib {
             return node->data;
         }
 
+        Node* findHelper(Node* node, const T& value) const {
+            if (!node) return nullptr;
+            if (value < node->data) return findHelper(node->left, value);
+            if (value > node->data) return findHelper(node->right, value);
+            return node;
+        }
+
+        void inorderCallbackHelper(Node* node, std::function<void(T&)> fn) {
+            if (node) {
+                inorderCallbackHelper(node->left, fn);
+                fn(node->data);
+                inorderCallbackHelper(node->right, fn);
+            }
+        }
+
+        void inorderCallbackHelper(Node* node, std::function<void(const T&)> fn) const {
+            if (node) {
+                inorderCallbackHelper(node->left, fn);
+                fn(node->data);
+                inorderCallbackHelper(node->right, fn);
+            }
+        }
+
     public:
         AVL() : root(nullptr), sze(0) {}
 
@@ -286,6 +310,27 @@ namespace lib {
 
         bool empty() const {
             return root == nullptr;
+        }
+
+        /** Tim kiem va tra ve con tro den phan tu (nullptr neu khong tim thay) */
+        T* find(const T& value) {
+            Node* node = findHelper(root, value);
+            return node ? &node->data : nullptr;
+        }
+
+        const T* find(const T& value) const {
+            Node* node = findHelper(root, value);
+            return node ? &node->data : nullptr;
+        }
+
+        /** Duyet inorder voi callback (co the sua du lieu) */
+        void inorder(std::function<void(T&)> fn) {
+            inorderCallbackHelper(root, fn);
+        }
+
+        /** Duyet inorder voi callback (chi doc) */
+        void inorder(std::function<void(const T&)> fn) const {
+            inorderCallbackHelper(root, fn);
         }
     };
 }

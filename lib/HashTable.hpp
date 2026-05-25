@@ -118,7 +118,7 @@ namespace lib {
             return false;
         }
 
-        Node* find(const KeyType& key) {
+        Node* findNode(const KeyType& key) {
             size_t index = hashFunction(key);
             Node* head = table[index];
 
@@ -131,7 +131,7 @@ namespace lib {
             return nullptr;
         }
 
-        const Node* find(const KeyType& key) const {
+        const Node* findNode(const KeyType& key) const {
             size_t index = hashFunction(key);
             Node* head = table[index];
 
@@ -139,6 +139,22 @@ namespace lib {
                 if (head->key == key) {
                     return head;
                 }
+                head = head->next;
+            }
+            return nullptr;
+        }
+
+        /** Tra ve con tro den gia tri (nullptr neu khong tim thay) */
+        ValueType* find(const KeyType& key) {
+            Node* node = findNode(key);
+            return node ? &node->value : nullptr;
+        }
+
+        const ValueType* find(const KeyType& key) const {
+            size_t index = hashFunction(key);
+            Node* head = table[index];
+            while (head != nullptr) {
+                if (head->key == key) return &head->value;
                 head = head->next;
             }
             return nullptr;
@@ -163,6 +179,17 @@ namespace lib {
 
         bool empty() const {
             return current_size == 0;
+        }
+
+        /** Duyet toan bo bang bam voi callback */
+        void forEach(std::function<void(const KeyType&, const ValueType&)> fn) const {
+            for (size_t i = 0; i < capacity; i++) {
+                Node* head = table[i];
+                while (head != nullptr) {
+                    fn(head->key, head->value);
+                    head = head->next;
+                }
+            }
         }
     };
 }
