@@ -1,28 +1,70 @@
-#Hệ thống Quản lý nhà xe - Giao diện dòng lệnh
+# Hệ thống Quản lý Nhà xe
 
-Phiên bản đồ họa đơn giản chỉ dùng dòng lệnh điều khiển
+Project mô phỏng hệ thống quản lý nhà xe, gồm 2 phiên bản giao diện:
 
-#Biên dịch giao diện dòng lệnh
+- **TUI**: giao diện dòng lệnh, chạy được trên Windows và Linux.
+- **GUI Win32**: giao diện cửa sổ Windows, xây dựng bằng Win32 API.
 
-Dán lệnh sau vào **Terminal** hoặc **Command Prompt / PowerShell** tại thư mục project
+---
+
+# 1. Phiên bản TUI - Giao diện dòng lệnh
+
+Phiên bản TUI dùng `cin/cout`, không phụ thuộc thư viện đồ họa ngoài.
+
+## Biên dịch trên Windows
+
+Mở **PowerShell**, **Command Prompt**, **MSYS2 UCRT64** hoặc terminal trong VS Code tại thư mục project.
+
+Chạy lệnh:
 
 ```bat
-g++ -std=c++17 -O2 -I./app -I./lib -o parking_tui app/main_tui.cpp
+g++ -std=c++17 -O2 -I./app -I./lib -o parking_tui.exe app/main_tui.cpp
 ```
 
-#Chạy giao diện dòng lệnh
+## Chạy trên Windows
 
-Trên Window chạy lệnh sau:
+Nếu dùng **PowerShell**:
 
-```bat
+```powershell
+.\parking_tui.exe
+```
+
+Nếu dùng **Command Prompt**:
+
+```cmd
+parking_tui.exe
+```
+
+Nếu dùng **Git Bash / MSYS2 terminal**:
+
+```bash
 ./parking_tui.exe
 ```
 
-Trên Linux chạy lệnh sau:
+---
 
-```bat
+## Biên dịch trên Linux
+
+Mở terminal tại thư mục project, sau đó chạy:
+
+```bash
+g++ -std=c++17 -O2 -I./app -I./lib -o parking_tui app/main_tui.cpp
+```
+
+## Chạy trên Linux
+
+```bash
 ./parking_tui
 ```
+
+Nếu bị lỗi `Permission denied`, chạy thêm:
+
+```bash
+chmod +x parking_tui
+./parking_tui
+```
+
+---
 
 # Hệ thống Quản lý Nhà xe - Phiên bản GUI Win32
 
