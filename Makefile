@@ -1,7 +1,7 @@
 CXX      = C:/msys64/ucrt64/bin/g++.exe
 CXXFLAGS = -std=c++17 -O2 -Wall -DUNICODE -D_UNICODE \
            -I./app -I./lib
-LDFLAGS  = -lgdi32 -lcomctl32 -lcomdlg32 -mwindows -static-libgcc -static-libstdc++
+LDFLAGS  = -lgdi32 -lcomctl32 -lcomdlg32 -mwindows -static -static-libgcc -static-libstdc++
 TARGET   = parking_gui.exe
 SRC      = app/main.cpp
 

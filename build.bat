@@ -10,7 +10,7 @@ set SRC=app\main.cpp
 set OUT=parking_gui.exe
 set INC=-I.\app -I.\lib
 set FLAGS=-std=c++17 -O2 -DUNICODE -D_UNICODE %INC%
-set LIBS=-lgdi32 -lcomctl32 -lcomdlg32 -mwindows -static-libgcc -static-libstdc++
+set LIBS=-lgdi32 -lcomctl32 -lcomdlg32 -mwindows -static -static-libgcc -static-libstdc++
 
 echo [BUILD] He thong Quan ly Nha xe - GUI Win32
 echo.
