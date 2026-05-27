@@ -1,6 +1,32 @@
+#Hệ thống Quản lý nhà xe - Giao diện dòng lệnh
+
+Phiên bản đồ họa đơn giản chỉ dùng dòng lệnh điều khiển
+
+#Biên dịch giao diện dòng lệnh
+
+Dán lệnh sau vào **Terminal** hoặc **Command Prompt / PowerShell** tại thư mục project
+
+```bat
+g++ -std=c++17 -O2 -I./app -I./lib -o parking_tui app/main_tui.cpp
+```
+
+#Chạy giao diện dòng lệnh
+
+Trên Window chạy lệnh sau:
+
+```bat
+./parking_tui.exe
+```
+
+Trên Linux chạy lệnh sau:
+
+```bat
+./parking_tui
+```
+
 # Hệ thống Quản lý Nhà xe - Phiên bản GUI Win32
 
-Phiên bản hoàn thiện với giao diện cửa sổ Windows thực sự, xây dựng bằng **Win32 API** thuần túy + **g++ (MSYS2)**.
+Phiên bản hoàn thiện với giao diện cửa sổ Windows thực sự, xây dựng bằng **Win32 API** thuần túy  **g++ (MSYS2)**.
 
 ## Chạy ngay (không cần cài gì)
 
