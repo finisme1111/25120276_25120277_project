@@ -2,25 +2,24 @@
 
 Phiên bản hoàn thiện với giao diện cửa sổ Windows thực sự, xây dựng bằng **Win32 API** thuần túy + **g++ (MSYS2)**.
 
-## Chạy ngay
+## Chạy ngay (không cần cài gì)
 
-```
-parking_gui.exe
-```
-(Đặt `map.txt` và `DanhSachSV.txt` cùng thư mục với exe)
+1. Clone repo về
+2. Double-click `parking_gui.exe`
 
-## Build lại
+> `map.txt` và `DanhSachSV.txt` phải nằm cùng thư mục với exe (đã có sẵn trong repo).
+
+## Build lại từ source
+
+Yêu cầu: **MSYS2** với `ucrt64` toolchain (`C:\msys64\ucrt64\bin\g++.exe`)
 
 ```bat
 build.bat
 ```
-Yêu cầu: **MSYS2** với `ucrt64` toolchain (`C:\msys64\ucrt64\bin\g++.exe`)
 
 Hoặc thủ công:
 ```bat
-g++ -std=c++17 -O2 -DUNICODE -D_UNICODE -I./app -I./lib ^
-    -o parking_gui.exe app/main.cpp ^
-    -lgdi32 -lcomctl32 -lcomdlg32 -mwindows -static-libgcc -static-libstdc++
+g++ -std=c++17 -O2 -DUNICODE -D_UNICODE -I./app -I./lib -o parking_gui.exe app/main.cpp -lgdi32 -lcomctl32 -lcomdlg32 -mwindows -static -static-libgcc -static-libstdc++
 ```
 
 ## Giao diện - 7 Tab
@@ -56,11 +55,11 @@ g++ -std=c++17 -O2 -DUNICODE -D_UNICODE -I./app -I./lib ^
 ## Cấu trúc thư mục
 
 ```
-APP_NEW/
-├── parking_gui.exe      ← Chạy trực tiếp
+25120276_25120277_project/
+├── parking_gui.exe      ← Chạy trực tiếp (không cần cài gì)
 ├── map.txt              ← Bản đồ bãi xe
 ├── DanhSachSV.txt       ← Danh sách người dùng (tự động lưu)
-├── build.bat            ← Script build
+├── build.bat            ← Script build (cần MSYS2)
 ├── Makefile             ← Makefile cho mingw32-make
 ├── README.md
 ├── app/
