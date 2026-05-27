@@ -66,7 +66,7 @@ chmod +x parking_tui
 
 ---
 
-# Hệ thống Quản lý Nhà xe - Phiên bản GUI Win32
+# 2. Hệ thống Quản lý Nhà xe - Phiên bản GUI Win32
 
 Phiên bản hoàn thiện với giao diện cửa sổ Windows thực sự, xây dựng bằng **Win32 API** thuần túy  **g++ (MSYS2)**.
 
