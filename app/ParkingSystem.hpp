@@ -12,6 +12,9 @@
 #include <sstream>
 #include <fstream>
 #include <ctime>
+#include <array>
+#include <cstdio>
+#include <algorithm>
 using namespace std;
 
 static const int FEE_SV = 2000, FEE_GV = 0, FEE_KH = 5000;
