@@ -1,23 +1,20 @@
-CXX      = C:/msys64/ucrt64/bin/g++.exe
-CXXFLAGS = -std=c++17 -O2 -Wall -DUNICODE -D_UNICODE \
-           -I./app -I./lib
-LDFLAGS  = -lgdi32 -lcomctl32 -lcomdlg32 -mwindows -static -static-libgcc -static-libstdc++
-TARGET   = parking_gui.exe
-SRC      = app/main.cpp
+ifeq ($(OS),Windows_NT)
 
-all: $(TARGET)
-	@echo.
-	@echo [OK] Build thanh cong: $(TARGET)
-	@echo [OK] Chay: $(TARGET)
+CXX = C:/msys64/ucrt64/bin/g++.exe
+TARGET = parking_gui.exe
+SRC = app/main.cpp
+LDFLAGS = -lgdi32 -lcomctl32 -lcomdlg32 -mwindows
 
-$(TARGET): $(SRC) app/ParkingSystem.hpp app/ParkingMap.hpp app/models.hpp
-	$(CXX) $(CXXFLAGS) -o $@ $(SRC) $(LDFLAGS)
+else
 
-clean:
-	@if exist $(TARGET) del /Q $(TARGET)
-	@echo [OK] Da xoa $(TARGET)
+CXX = g++
+TARGET = parking_tui
+SRC = app/main_tui.cpp
+LDFLAGS =
 
-run: all
-	./$(TARGET)
+endif
 
-.PHONY: all clean run
+CXXFLAGS = -std=c++17 -O2 -Wall -I./app -I./lib
+
+all:
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRC) $(LDFLAGS)
