@@ -34,12 +34,12 @@ public:
     // gan hang doi bang cach di chuyen
     Queue& operator=(Queue&&) noexcept = default;
 
-    // ham them gia tri vao cuoi hang doi
+    // ham them gia tri vao hang doi
     void enqueue(const T& value) {
         list.insertBack(value);
     }
 
-    // ham xoa gia tri o dau hang doi
+    // ham xoa gia tri khoi hang doi
     void dequeue() {
         if (empty()) throw std::underflow_error("Queue underflow: Queue is empty.");
 
