@@ -445,6 +445,46 @@ namespace lib {
         void inorder(Function function) const {
             inorderCallback(root, function);
         }
+
+        // ham tim node theo khoa duoc trich xuat tu du lieu
+        template <typename Key, typename KeyExtractor, typename KeyCompare = std::less<Key>>
+        T* findByKey(const Key& key, KeyExtractor getKey, KeyCompare keyCompare = KeyCompare{}) {
+            Node* current = root;
+
+            while (current) {
+            const auto& currentKey = getKey(current->data);
+
+            if (keyCompare(key, currentKey)) {
+                current = current->left;
+            } else if (keyCompare(currentKey, key)) {
+                current = current->right;
+            } else {
+                return &current->data;
+            }
+        }
+
+        return nullptr;
+        }
+
+        // ham tim node theo khoa duoc trich xuat tu du lieu, khong cho phep thay doi du lieu
+        template <typename Key, typename KeyExtractor, typename KeyCompare = std::less<Key>>
+        const T* findByKey(const Key& key, KeyExtractor getKey, KeyCompare keyCompare = KeyCompare{}) const {
+            const Node* current = root;
+
+            while (current) {
+                const auto& currentKey = getKey(current->data);
+
+                if (keyCompare(key, currentKey)) {
+                    current = current->left;
+                } else if (keyCompare(currentKey, key)) {
+                    current = current->right;
+                } else {
+                    return &current->data;
+                }
+            }
+
+            return nullptr;
+        }
     };
 
 }
