@@ -1,197 +1,171 @@
 #pragma once
 #ifndef HASHTABLE_HPP
 #define HASHTABLE_HPP
-#include <stdexcept>
+
+#include "AVL.hpp"
+
 #include <cstddef>
 #include <functional>
+#include <stdexcept>
+#include <utility>
 
 namespace lib {
-    template<typename KeyType, typename ValueType>
-    class HashTable {
-    public:
-        struct Node {
-            KeyType key;
-            ValueType value;
-            Node* next;
-            Node(const KeyType& k, const ValueType& v) : key(k), value(v), next(nullptr) {}
-        };
-        
-    private:
-        Node** table;
-        size_t capacity;
-        size_t current_size;
 
-        size_t hashFunction(const KeyType& key) const {
-            return std::hash<KeyType>{}(key) % capacity;
-        }
+template <typename KeyType, typename ValueType>
+class HashTable {
+private:
+    using Pair = std::pair<KeyType, ValueType>;
 
-        void rehash() {
-            size_t oldCapacity = capacity;
-            capacity *= 2;
-
-            Node** oldTable = table;
-            table = new Node*[capacity]();
-
-            for (size_t i = 0; i < oldCapacity; i++) {
-                Node* head = oldTable[i];
-                while (head != nullptr) {
-                    Node* nextNode = head->next;
-
-                    size_t newIndex = hashFunction(head->key);
-                    head->next = table[newIndex];
-                    table[newIndex] = head;
-                    head = nextNode;
-                }
-            }
-            delete[] oldTable;
-        }
-
-    public:
-        HashTable(size_t cap = 101) : capacity(cap), current_size(0) {
-            table = new Node*[capacity]();
-        }
-
-        ~HashTable() {
-            clear();
-            delete[] table;
-        }
-
-        HashTable(const HashTable&) = delete;
-        HashTable& operator=(const HashTable&) = delete;
-
-        void insert(const KeyType& key, const ValueType& value) {
-            size_t index = hashFunction(key);
-            Node* head = table[index];
-
-            while (head != nullptr) {
-                if (head->key == key) {
-                    head->value = value;
-                    return;
-                }
-                head = head->next;
-            }
-
-            if ((current_size + 1) * 4 > capacity * 3) {
-                rehash();
-                index = hashFunction(key);
-            }
-
-            Node* newNode = new Node(key, value);
-            newNode->next = table[index];
-            table[index] = newNode;
-            current_size++;
-        }
-
-        bool remove(const KeyType& key) {
-            size_t index= hashFunction(key);
-            Node* head = table[index];
-            Node* prev = nullptr;
-
-            while (head != nullptr) {
-                if (head->key == key) {
-                    if (prev == nullptr) {
-                        table[index] = head->next;
-                    }
-                    else {
-                        prev->next = head->next;
-                    }
-                    delete head;
-                    current_size--;
-                    return true;
-                }
-                prev = head;
-                head = head->next;
-            }
-            return false;
-        }
-
-        bool contains(const KeyType& key) const {
-            size_t index = hashFunction(key);
-            Node* head = table[index];
-
-            while (head != nullptr) {
-                if (head->key == key) {
-                    return true;
-                }
-                head = head->next;
-            }
-            return false;
-        }
-
-        Node* findNode(const KeyType& key) {
-            size_t index = hashFunction(key);
-            Node* head = table[index];
-
-            while (head != nullptr) {
-                if (head->key == key) {
-                    return head;
-                }
-                head = head->next;
-            }
-            return nullptr;
-        }
-
-        const Node* findNode(const KeyType& key) const {
-            size_t index = hashFunction(key);
-            Node* head = table[index];
-
-            while (head != nullptr) {
-                if (head->key == key) {
-                    return head;
-                }
-                head = head->next;
-            }
-            return nullptr;
-        }
-
-        /** Tra ve con tro den gia tri (nullptr neu khong tim thay) */
-        ValueType* find(const KeyType& key) {
-            Node* node = findNode(key);
-            return node ? &node->value : nullptr;
-        }
-
-        const ValueType* find(const KeyType& key) const {
-            size_t index = hashFunction(key);
-            Node* head = table[index];
-            while (head != nullptr) {
-                if (head->key == key) return &head->value;
-                head = head->next;
-            }
-            return nullptr;
-        }
-
-        void clear() {
-            for (size_t i = 0; i < capacity; i++) {
-                Node* head = table[i];
-                while (head != nullptr) {
-                    Node* temp = head;
-                    head = head->next;
-                    delete temp;
-                }
-                table[i] = nullptr;
-            }
-            current_size = 0;
-        }
-
-        size_t size() const {
-            return current_size;
-        }
-
-        bool empty() const {
-            return current_size == 0;
-        }
-
-        /** Duyet toan bo bang bam voi callback */
-        void forEach(std::function<void(const KeyType&, const ValueType&)> fn) const {
-            for (size_t i = 0; i < capacity; i++) {
-                Node* head = table[i];
-                while (head != nullptr) {
-                    fn(head->key, head->value);
-                    head = head->next;
-                }
-            }
+    // so sanh 2 pair chi duoc so sanh theo key
+    struct PairCompare {
+        bool operator()(
+            const Pair& first,
+            const Pair& second
+        ) const {
+            return std::less<KeyType>{}(
+                first.first,
+                second.first
+            );
         }
     };
+
+    // ham lay key tu pair
+    struct KeyExtractor {
+        const KeyType& operator()(const Pair& item) const {
+            return item.first;
+        }
+    };
+
+    // moi bucket la 1 AVL rieng biet, sap xep theo key cua pair
+    using Bucket = AVL<Pair, PairCompare>;
+
+    Bucket* table;
+    std::size_t capacity;
+    std::size_t currentSize;
+
+    // ham bam key de tim index cua bucket
+    std::size_t hashFunction(const KeyType& key) const {
+        return std::hash<KeyType>{}(key) % capacity;
+    }
+
+public:
+    // khoi tao bang bam voi so bucket mac dinh la 101
+    explicit HashTable(std::size_t cap = 101): table(nullptr), capacity(cap), currentSize(0) {
+        if (capacity == 0) throw std::invalid_argument("Hash table capacity must be greater than zero.");
+
+        // moi phan tu cua table la 1 AVL rieng biet
+        table = new Bucket[capacity];
+    }
+
+    // xoa bang bam va giai phong bo nho
+    ~HashTable() {
+        delete[] table;
+    }
+
+    // vo hieu hoa ham sao chep de tranh sao chep khong mong muon
+    HashTable(const HashTable&) = delete;
+
+    // vo hieu hoa toan tu gan de tranh gan khong mong muon
+    HashTable& operator=(const HashTable&) = delete;
+
+    // ham them key-value moi vao bang bam
+    void insert(const KeyType& key, const ValueType& value) {
+        const std::size_t index = hashFunction(key);
+        Bucket& bucket = table[index];
+
+        Pair* existing = bucket.findByKey(key, KeyExtractor{});
+
+        if (existing) {
+            existing->second = value;
+            return;
+        }
+
+        if (bucket.insert(Pair(key, value))) ++currentSize;
+    }
+
+    // ham xoa phan tu theo key
+    bool remove(const KeyType& key) {
+        const std::size_t index = hashFunction(key);
+        Bucket& bucket = table[index];
+
+        Pair* item = bucket.findByKey(key, KeyExtractor{});
+
+        if (!item) return false;
+
+        Pair target = *item;
+
+        if (bucket.remove(target)) {
+            --currentSize;
+            return true;
+        }
+
+        return false;
+    }
+
+    // ham kiem tra key co ton tai hay khong
+    bool contains(const KeyType& key) const {
+        return find(key) != nullptr;
+    }
+
+    // ham tim kiem value theo key, tra ve con tro den value de co the chinh sua
+    ValueType* find(const KeyType& key) {
+        const std::size_t index = hashFunction(key);
+        Bucket& bucket = table[index];
+
+        Pair* item = bucket.findByKey(
+            key,
+            KeyExtractor{}
+        );
+
+        return item ? &item->second : nullptr;
+    }
+
+    // ham tim kiem value theo key, tra ve con tro den value de chi doc
+    const ValueType* find(const KeyType& key) const {
+        const std::size_t index = hashFunction(key);
+
+        const Bucket& bucket = table[index];
+
+        const Pair* item = bucket.findByKey(
+            key,
+            KeyExtractor{}
+        );
+
+        return item ? &item->second : nullptr;
+    }
+
+    // ham xoa toan bo phan tu trong bang bam, nhung van giu lai cac bucket (AVL) de su dung lai
+    void clear() {
+        for (std::size_t i = 0; i < capacity; ++i) {
+            table[i].clear();
+        }
+
+        currentSize = 0;
+    }
+
+    // ham lay so luong phan tu hien tai trong bang bam
+    std::size_t size() const {
+        return currentSize;
+    }
+
+    bool empty() const {
+        return currentSize == 0;
+    }
+
+    // ham duyet toan bo phan tu trong bang bam, truyen vao 1 ham de thuc thi tren moi cap key-value
+    void forEach(const std::function<void(const KeyType&, const ValueType&)> & function) const {
+        for (std::size_t i = 0; i < capacity; ++i) {
+            const Bucket& bucket = table[i];
+
+            bucket.inorder(
+                [&function](const Pair& item) {
+                    function(item.first, item.second);
+                }
+            );
+        }
+    }
+};
+
 }
 
 #endif
