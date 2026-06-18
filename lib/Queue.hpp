@@ -1,66 +1,81 @@
 #pragma once
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
+
 #include "LinkedList.hpp"
-#include <stdexcept>
+
 #include <cstddef>
-#include <functional>
+#include <stdexcept>
 
 namespace lib {
-    template<typename T>
-    class Queue {
-    private:
-        LinkedList<T> list;
-    public:
-        Queue() = default;
 
-        ~Queue() = default;
+template <typename T>
+// hang doi
+class Queue {
+private:
+    LinkedList<T> list;
 
-        Queue(const Queue& other) : list(other.list) {}
+public:
+    // khoi tao hang doi
+    Queue() = default;
 
-        Queue& operator=(const Queue& other) {
-            if (this != &other) {
-                list = other.list;
-            }
-            return *this;
-        }
+    // xoa hang doi
+    ~Queue() = default;
 
-        void enqueue(const T& value) {
-            list.insertBack(value);
-        }
+    // sao chep hang doi
+    Queue(const Queue&) = default;
 
-        void dequeue() {
-            if (empty()) {
-                throw std::underflow_error("Queue underflow: Queue is empty.");
-            }
-            list.removeFront();
-        }
+    // di chuyen hang doi
+    Queue(Queue&&) noexcept = default;
 
-        T front() {
-            if (empty()) {
-                throw std::underflow_error("Queue underflow: Queue is empty.");
-            }
-            return list.front();
-        }
+    // gan hang doi
+    Queue& operator=(const Queue&) = default;
 
-        T front() const {
-            if (empty()) {
-                throw std::underflow_error("Queue underflow: Queue is empty.");
-            }
-            return list.front();
-        }
+    // gan hang doi bang cach di chuyen
+    Queue& operator=(Queue&&) noexcept = default;
 
-        bool empty() const {
-            return list.empty();
-        }
+    // ham them gia tri vao cuoi hang doi
+    void enqueue(const T& value) {
+        list.insertBack(value);
+    }
 
-        size_t size() const {
-            return list.size();
-        }
+    // ham xoa gia tri o dau hang doi
+    void dequeue() {
+        if (empty()) throw std::underflow_error("Queue underflow: Queue is empty.");
 
-        void clear() {
-            list.clear();
-        }
-    };
+        list.removeFront();
+    }
+
+    // ham lay gia tri o dau hang doi
+    T& front() {
+        if (empty()) throw std::underflow_error("Queue underflow: Queue is empty.");
+
+        return list.front();
+    }
+
+    // ham lay gia tri o dau hang doi, khong thay doi du lieu
+    const T& front() const {
+        if (empty()) throw std::underflow_error("Queue underflow: Queue is empty.");
+
+        return list.front();
+    }
+
+    // ham kiem tra hang doi co rong hay khong
+    bool empty() const {
+        return list.empty();
+    }
+
+    // ham tra ve kich thuoc cua hang doi
+    std::size_t size() const {
+        return list.size();
+    }
+
+    // ham xoa toan bo phan tu trong hang doi
+    void clear() noexcept {
+        list.clear();
+    }
+};
+
 }
+
 #endif
