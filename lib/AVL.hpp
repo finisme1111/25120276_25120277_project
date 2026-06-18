@@ -95,14 +95,14 @@ namespace lib {
 
             const int balance = getBalance(node);
 
-            // left-left hoac left-right.
+            // left-left hoac left-right
             if (balance > 1) {
                 if (getBalance(node->left) < 0) node->left = rotateLeft(node->left);
 
                 return rotateRight(node);
             }
 
-            // right-right hoac right-left.
+            // right-right hoac right-left
             if (balance < -1) {
                 if (getBalance(node->right) > 0) node->right = rotateRight(node->right);
 
@@ -401,10 +401,7 @@ namespace lib {
 
         // ham tra ve gia tri lon nhat trong cay
         T getMax() const {
-            if (!root) {
-                throw std::underflow_error("Tree is empty.");
-            }
-
+            if (!root) throw std::underflow_error("Tree is empty.");
             return getMaxNode(root)->data;
         }
 
