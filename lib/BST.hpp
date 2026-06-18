@@ -1,172 +1,219 @@
 #pragma once
 #ifndef BST_HPP
 #define BST_HPP
+
 #include <cstddef>
-#include <stdexcept>
-#include <functional>
 #include <iostream>
 
 namespace lib {
-    template<typename T>
-    class BST {
-    private:
-        struct Node {
-            T data;
-            Node* left;
-            Node* right;
-            Node(const T& value) : data(value), left(nullptr), right(nullptr) {}
-        };
-        Node* root;
-        size_t sze;
 
-        void clear(Node* node) {
-            if (node) {
-                clear(node->left);
-                clear(node->right);
-                delete node;
-            }
-        }
+template <typename T>
+// cay BST
+class BST {
+private:
+    struct Node {
+        T data;
+        Node* left;
+        Node* right;
 
-        Node* copyTree(Node* node) {
-            if (!node) return nullptr;
-            Node* newNode = new Node(node->data);
+        explicit Node(const T& value): data(value), left(nullptr), right(nullptr) {}
+    };
+
+    Node* root;
+    std::size_t sze;
+
+    // ham xoa toan bo cay
+    static void destroy(Node* node) {
+        if (!node) return;
+
+        destroy(node->left);
+        destroy(node->right);
+        delete node;
+    }
+
+    // ham sao chep cay
+    static Node* copyTree(const Node* node) {
+        if (!node) return nullptr;
+
+        Node* newNode = new Node(node->data);
+
+        try {
             newNode->left = copyTree(node->left);
             newNode->right = copyTree(node->right);
-            return newNode;
+        } catch (...) {
+            destroy(newNode);
+            throw;
         }
 
-        bool insertHelper(Node*& node, const T& value) {
-            if (!node) {
-                node = new Node(value);
-                sze++;
-                return true;
-            }
-            if (value < node->data) return insertHelper(node->left, value);
-            if (value > node->data) return insertHelper(node->right, value);
-            return false;
-        }
+        return newNode;
+    }
 
-        bool searchHelper(Node* node, const T& value) const {
-            if (!node) return false;
-            if (value < node->data) return searchHelper(node->left, value);
-            if (value > node->data) return searchHelper(node->right, value);
+    // ham phu tro them node vao cay
+    bool insertHelper(Node*& node, const T& value) {
+        if (!node) {
+            node = new Node(value);
+            ++sze;
             return true;
         }
 
-        bool removeHelper(Node*& node, const T& value) {
-            if (!node) return false;
+        if (value < node->data) return insertHelper(node->left, value);
 
-            if (value < node->data) return removeHelper(node->left, value);
-            if (value > node->data) return removeHelper(node->right, value);
+        if (node->data < value) return insertHelper(node->right, value);
 
-            if (!node->left) {
-                Node* temp = node->right;
-                delete node;
-                node = temp;
-            }
-            else if (!node->right) {
-                Node* temp = node->left;
-                delete node;
-                node = temp;
-            }
-            else {
-                Node* minNode = node->right;
-                while (minNode->left) {
-                    minNode = minNode->left;
-                }
-                node->data = minNode->data;
-                removeHelper(node->right, node->data);
-                sze++;
-            }
-            sze--;
+        return false;
+    }
+
+    // ham phu tro tim kiem node trong cay
+    bool searchHelper(const Node* node, const T& value) const {
+        while (node) {
+            if (value < node->data) node = node->left;
+            else if (node->data < value) node = node->right;
+            else return true;
+        }
+
+        return false;
+    }
+
+    // ham phu tro xoa node khoi cay
+    bool removeHelper(Node*& node, const T& value) {
+        if (!node) return false;
+
+        if (value < node->data) return removeHelper(node->left, value);
+
+        if (node->data < value) return removeHelper(node->right, value);
+
+        // node co 0 con
+        if (!node->left) {
+            Node* oldNode = node;
+            node = node->right;
+            delete oldNode;
+            --sze;
             return true;
         }
 
-        void preorderHelper(Node* node) const {
-            if (node) {
-                std::cout << node->data << " ";
-                preorderHelper(node->left);
-                preorderHelper(node->right);
-            }
+        // node co 1 con
+        if (!node->right) {
+            Node* oldNode = node;
+            node = node->left;
+            delete oldNode;
+            --sze;
+            return true;
         }
 
-        void inorderHelper(Node* node) const {
-            if (node) {
-                inorderHelper(node->left);
-                std::cout << node->data << " ";
-                inorderHelper(node->right);
-            }
-        }
+        // node co 2 con, tra ve node nho nhat trong cay con phai de thay the
+        Node* successor = node->right;
 
-        void postorderHelper(Node* node) const {
-            if (node) {
-                postorderHelper(node->left);
-                postorderHelper(node->right);
-                std::cout << node->data << " ";
-            }
-        }
+        while (successor->left)
+            successor = successor->left;
 
-    public:
-        BST() : root(nullptr), sze(0) {}
+        node->data = successor->data;
 
-        ~BST() {
-            clear();
-        }
+        return removeHelper(node->right, successor->data);
+    }
 
-        void clear() {
-            clear(root);
-            root = nullptr;
-            sze = 0;
-        }
+    // ham phu tro duyet cay theo thu tu node-left-right
+    static void preorderHelper(const Node* node) {
+        if (!node) return;
 
-        BST(const BST& other) : root(nullptr), sze(0) {
-            root = copyTree(other.root);
+        std::cout << node->data << ' ';
+        preorderHelper(node->left);
+        preorderHelper(node->right);
+    }
+
+    // ham phu tro duyet cay theo thu tu left-node-right
+    static void inorderHelper(const Node* node) {
+        if (!node) return;
+
+        inorderHelper(node->left);
+        std::cout << node->data << ' ';
+        inorderHelper(node->right);
+    }
+
+    // ham phu tro duyet cay theo thu tu left-right-node
+    static void postorderHelper(const Node* node) {
+        if (!node) return;
+
+        postorderHelper(node->left);
+        postorderHelper(node->right);
+        std::cout << node->data << ' ';
+    }
+
+public:
+    // ham khoi tao cay BST
+    BST() : root(nullptr), sze(0) {}
+
+    // ham xoa cay BST
+    ~BST() {
+        clear();
+    }
+
+    // ham sao chep cay BST
+    BST(const BST& other): root(copyTree(other.root)), sze(other.sze) {}
+
+    // ham gan cay BST
+    BST& operator=(const BST& other) {
+        if (this != &other) {
+            Node* newRoot = copyTree(other.root);
+
+            destroy(root);
+            root = newRoot;
             sze = other.sze;
         }
 
-        BST& operator=(const BST& other) {
-            if (this != &other) {
-                clear();
-                root = copyTree(other.root);
-                sze = other.sze;
-            }
-            return *this;
-        }
+        return *this;
+    }
 
-        bool insert(const T& value) {
-            return insertHelper(root, value);
-        }
+    // ham xoa toan bo cay BST
+    void clear() {
+        destroy(root);
+        root = nullptr;
+        sze = 0;
+    }
 
-        bool remove(const T& value) {
-            return removeHelper(root, value);
-        }
+    // ham them node vao cay BST
+    bool insert(const T& value) {
+        return insertHelper(root, value);
+    }
 
-        bool search(const T& value) const {
-            return searchHelper(root, value);
-        }
+    // ham xoa node khoi cay BST
+    bool remove(const T& value) {
+        return removeHelper(root, value);
+    }
 
-        void preorder() const {
-            preorderHelper(root);
-            std::cout << '\n';
-        }
+    // ham tim kiem node trong cay BST
+    bool search(const T& value) const {
+        return searchHelper(root, value);
+    }
 
-        void inorder() const {
-            inorderHelper(root);
-            std::cout << '\n';
-        }
+    // ham duyet cay theo thu tu node-left-right    
+    void preorder() const {
+        preorderHelper(root);
+        std::cout << '\n';
+    }
 
-        void postorder() const {
-            postorderHelper(root);
-            std::cout << '\n';
-        }
+    // ham duyet cay theo thu tu left-node-right
+    void inorder() const {
+        inorderHelper(root);
+        std::cout << '\n';
+    }
 
-        size_t size() const {
-            return sze;
-        }
+    // ham duyet cay theo thu tu left-right-node
+    void postorder() const {
+        postorderHelper(root);
+        std::cout << '\n';
+    }
 
-        bool empty() const {
-            return root == nullptr;
-        }
-    };
+    // ham tra ve so luong node trong cay BST
+    std::size_t size() const {
+        return sze;
+    }
+
+    // ham kiem tra cay BST co rong hay khong
+    bool empty() const {
+        return root == nullptr;
+    }
+};
+
 }
+
 #endif

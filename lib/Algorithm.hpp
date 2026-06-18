@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ALGORITHM_HPP
 #define ALGORITHM_HPP
 

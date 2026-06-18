@@ -1,3 +1,4 @@
+#pragma once
 #ifndef AVL_HPP
 #define AVL_HPP
 
