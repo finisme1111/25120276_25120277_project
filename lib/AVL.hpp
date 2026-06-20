@@ -1,4 +1,3 @@
-#pragma once
 #ifndef AVL_HPP
 #define AVL_HPP
 
@@ -9,7 +8,7 @@
 #include <utility>
 
 namespace lib {
-    template <typename T, typename Compare = std::less<T>>\
+    template <typename T, typename Compare = std::less<T>>
     // Cay AVL
     class AVL {
     private:

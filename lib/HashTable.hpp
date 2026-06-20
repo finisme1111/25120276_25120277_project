@@ -1,4 +1,3 @@
-#pragma once
 #ifndef HASHTABLE_HPP
 #define HASHTABLE_HPP
 
@@ -48,6 +47,20 @@ private:
         return std::hash<KeyType>{}(key) % capacity;
     }
 
+    void swapMembers(HashTable& other) noexcept {
+        Bucket* temporaryTable = table;
+        table = other.table;
+        other.table = temporaryTable;
+
+        std::size_t temporaryCapacity = capacity;
+        capacity = other.capacity;
+        other.capacity = temporaryCapacity;
+
+        std::size_t temporarySize = currentSize;
+        currentSize = other.currentSize;
+        other.currentSize = temporarySize;
+    }
+
 public:
     // khoi tao bang bam voi so bucket mac dinh la 101
     explicit HashTable(std::size_t cap = 101): table(nullptr), capacity(cap), currentSize(0) {
@@ -62,11 +75,62 @@ public:
         delete[] table;
     }
 
-    // vo hieu hoa ham sao chep de tranh sao chep khong mong muon
-    HashTable(const HashTable&) = delete;
+    // ham sao chep bang bam
+    HashTable(const HashTable& other)
+        : table(new Bucket[other.capacity]),
+          capacity(other.capacity),
+          currentSize(0) {
+        try {
+            other.forEach(
+                [&](const KeyType& key, const ValueType& value) {
+                    insert(key, value);
+                }
+            );
+        } catch (...) {
+            delete[] table;
+            table = nullptr;
+            capacity = 0;
+            currentSize = 0;
+            throw;
+        }
+    }
 
-    // vo hieu hoa toan tu gan de tranh gan khong mong muon
-    HashTable& operator=(const HashTable&) = delete;
+    // ham di chuyen bang bam
+    HashTable(HashTable&& other) noexcept
+        : table(other.table),
+          capacity(other.capacity),
+          currentSize(other.currentSize) {
+        other.table = nullptr;
+        other.capacity = 0;
+        other.currentSize = 0;
+    }
+
+    // gan bang bam bang cach copy-swap
+    HashTable& operator=(const HashTable& other) {
+        if (this != &other) {
+            HashTable temporary(other);
+            swapMembers(temporary);
+        }
+
+        return *this;
+    }
+
+    // gan bang bam bang cach di chuyen
+    HashTable& operator=(HashTable&& other) noexcept {
+        if (this != &other) {
+            delete[] table;
+
+            table = other.table;
+            capacity = other.capacity;
+            currentSize = other.currentSize;
+
+            other.table = nullptr;
+            other.capacity = 0;
+            other.currentSize = 0;
+        }
+
+        return *this;
+    }
 
     // ham them key-value moi vao bang bam
     void insert(const KeyType& key, const ValueType& value) {

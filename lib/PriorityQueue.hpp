@@ -1,4 +1,3 @@
-#pragma once
 #ifndef PRIORITYQUEUE_HPP
 #define PRIORITYQUEUE_HPP
 
