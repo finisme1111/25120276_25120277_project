@@ -1,0 +1,4 @@
+Link youtube video demo Ứng dụng quản lí nhà xe | Giao diện GUI trên Window.
+https://www.youtube.com/watch?v=WXlL69iH7GA
+Link youtube video demo Ứng dụng quản lí nhà xe | Giao diện TUI trên linux.
+https://www.youtube.com/watch?v=KgvWBPn1FCM&t=29s
